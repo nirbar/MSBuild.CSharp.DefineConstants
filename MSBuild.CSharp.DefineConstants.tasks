@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)build\bin\Debug\MSBuild.CSharp.DefineConstants\MSBuild.CSharp.DefineConstants.dll" TaskName="MSBuild.CSharp.DefineConstants.DefineConstantsTask"/>
+
+  <!-- Example usage
+  <Target Name="MyTarget">
+    <DefineConstantsTask DefineConstants='a=b;c=";d=@#$;e=;f;' FilePaths="$(MSBuildThisFileDirectory)DefineConstants.dll"/>
+  </Target>
+   -->
+</Project>
