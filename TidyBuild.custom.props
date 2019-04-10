@@ -3,5 +3,6 @@
   <Import Project="$(MSBuildThisFileDirectory)TidyBuild.user.props" Condition="Exists('$(MSBuildThisFileDirectory)TidyBuild.user.props')"/>
   <PropertyGroup>
     <FullVersion>1.0.0</FullVersion>
+    <NugetDir Condition="'$(NugetDir)'==''">$(MSBuildThisFileDirectory)..\Tools\</NugetDir>
   </PropertyGroup>
 </Project>

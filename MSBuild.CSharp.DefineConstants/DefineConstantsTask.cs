@@ -1,6 +1,7 @@
 ﻿using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -12,7 +13,6 @@ namespace MSBuild.CSharp.DefineConstants
     {
         public DefineConstantsTask()
         {
-            Assembly = "DefineConstants";
             Namespace = "Preprocessor";
             ClassName = "DefineConstants";
         }
@@ -21,11 +21,13 @@ namespace MSBuild.CSharp.DefineConstants
         {
             try
             {
-                AssemblyName aName = new AssemblyName(Assembly);
-                AssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(aName, AssemblyBuilderAccess.RunAndSave);
-
-                string targetPath = FilePaths[0].ItemSpec;
+                string targetPath = TargetAssembly.ItemSpec;
+                string targetDir = Path.GetDirectoryName(targetPath);
                 string targetFile = Path.GetFileName(targetPath);
+                string targetFileBase = Path.GetFileNameWithoutExtension(targetPath);
+
+                AssemblyName aName = new AssemblyName(targetFileBase);
+                AssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(aName, AssemblyBuilderAccess.RunAndSave, targetDir);
 
                 ModuleBuilder mb = ab.DefineDynamicModule(aName.Name, targetFile);
                 TypeBuilder tb = mb.DefineType($"{Namespace}.{ClassName}", TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.Abstract);
@@ -38,6 +40,7 @@ namespace MSBuild.CSharp.DefineConstants
 
                 if (!Log.HasLoggedErrors)
                 {
+                    Log.LogMessage(MessageImportance.High, $"Creating constants assembly '{targetPath}'");
                     Type t = tb.CreateType();
                     ab.Save(targetFile);
                 }
@@ -49,6 +52,7 @@ namespace MSBuild.CSharp.DefineConstants
             return !Log.HasLoggedErrors;
         }
 
+        private Dictionary<string, string> properties_ = new Dictionary<string, string>();
         private void CreateProperty(ITaskItem item, TypeBuilder typeBuilder)
         {
             string kv = item.ItemSpec;
@@ -74,6 +78,16 @@ namespace MSBuild.CSharp.DefineConstants
             // Validate property name.
             ValidateIdentifier(key);
 
+            // Warn on duplicate
+            if (properties_.ContainsKey(key))
+            {
+                if (properties_[key] != val)
+                {
+                    Log.LogWarning($"Property '{key}' was already defined. Existing value is '{properties_[key]}'. New value is '{val}'. Ignoring the new value");
+                }
+                return;
+            }
+
             PropertyBuilder pb = typeBuilder.DefineProperty(key, PropertyAttributes.None, typeof(string), null);
             MethodAttributes getAttr = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Static;
             MethodBuilder mbNumberGetAccessor = typeBuilder.DefineMethod($"get_{key}", getAttr, typeof(string), Type.EmptyTypes);
@@ -81,6 +95,9 @@ namespace MSBuild.CSharp.DefineConstants
             numberGetIL.Emit(OpCodes.Ldstr, val);
             numberGetIL.Emit(OpCodes.Ret);
             pb.SetGetMethod(mbNumberGetAccessor);
+            Log.LogMessage(MessageImportance.Low, $"Created constant property '{key}'='{val}'");
+
+            properties_.Add(key, val);
         }
 
         private readonly Regex identifierRegex_ = new Regex("^[a-z_][a-z0-9_]*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -96,9 +113,7 @@ namespace MSBuild.CSharp.DefineConstants
         public ITaskItem[] DefineConstants { get; set; }
 
         [Required]
-        public ITaskItem[] FilePaths { get; set; }
-
-        public string Assembly { get; set; }
+        public ITaskItem TargetAssembly { get; set; }
 
         public string Namespace { get; set; }
 

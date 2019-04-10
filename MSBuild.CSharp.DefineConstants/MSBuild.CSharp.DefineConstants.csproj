@@ -60,6 +60,9 @@
     <Error Condition="!Exists('..\packages\TidyBuild.1.1.0\build\TidyBuild.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\TidyBuild.1.1.0\build\TidyBuild.targets'))" />
   </Target>
   <Import Project="..\packages\TidyBuild.1.1.0\build\TidyBuild.targets" Condition="Exists('..\packages\TidyBuild.1.1.0\build\TidyBuild.targets')" />
+  <Target Name="AfterBuild" Condition="'$(Configuration)'=='Release'">
+    <Exec Command="&quot;$(NugetDir)nuget.exe&quot; pack &quot;$(MSBuildThisFileDirectory)..\Nuget-pkg\MSBuild.CSharp.DefineConstants.nuspec&quot; -OutputDirectory &quot;$(SolutionDir)build\nuget-out&quot; -Version $(FullVersion)" WorkingDirectory="$(SolutionDir)" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/01/nuspec.xsd">
+  <metadata minClientVersion="2.7">
+    <id>MSBuild.CSharp.DefineConstants</id>
+    <version>1.0.0</version>
+    <title>MSBuild managed preprocessor constants</title>
+    <authors>Nir Bar</authors>
+    <owners>Nir Bar</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://github.com/nirbar/MSBuild.CSharp.DefineConstants.git</projectUrl>
+    <description>MSBuild task to generate a managed assembly that defines "preprocessor" constants</description>
+    <tags>MSBuild preprocessor C#</tags>
+  </metadata>
+
+  <files>
+    <file src=".\MSBuild.CSharp.DefineConstants.tasks" target="build" />
+    <file src=".\MSBuild.CSharp.DefineConstants.targets" target="build" />
+    <file src="..\build\bin\Release\MSBuild.CSharp.DefineConstants\MSBuild.CSharp.DefineConstants.dll" target="tools\lib"/>
+  </files>
+
+</package>
