@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text.RegularExpressions;
 
 namespace MSBuild.CSharp.DefineConstants
 {
@@ -70,7 +71,8 @@ namespace MSBuild.CSharp.DefineConstants
                 return;
             }
 
-            //TODO Validate property name.
+            // Validate property name.
+            ValidateIdentifier(key);
 
             PropertyBuilder pb = typeBuilder.DefineProperty(key, PropertyAttributes.None, typeof(string), null);
             MethodAttributes getAttr = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Static;
@@ -79,6 +81,15 @@ namespace MSBuild.CSharp.DefineConstants
             numberGetIL.Emit(OpCodes.Ldstr, val);
             numberGetIL.Emit(OpCodes.Ret);
             pb.SetGetMethod(mbNumberGetAccessor);
+        }
+
+        private readonly Regex identifierRegex_ = new Regex("^[a-z_][a-z0-9_]*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private void ValidateIdentifier(string name)
+        {
+            if (!identifierRegex_.IsMatch(name))
+            {
+                Log.LogError($"'{name}' is not a valid C# identifier");
+            }
         }
 
         [Required]

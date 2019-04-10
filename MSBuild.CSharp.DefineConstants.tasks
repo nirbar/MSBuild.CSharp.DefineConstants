@@ -4,7 +4,7 @@
 
   <!-- Example usage
   <Target Name="MyTarget">
-    <DefineConstantsTask DefineConstants='a=b;c=";d=@#$;e=;f;' FilePaths="$(MSBuildThisFileDirectory)DefineConstants.dll"/>
+    <DefineConstantsTask DefineConstants='a=b;c=";d=@#$;e=;f;A=bsfsdfsdfsdfsdf"' FilePaths="$(MSBuildThisFileDirectory)DefineConstants.dll"/>
   </Target>
-   -->
+  -->
 </Project>
