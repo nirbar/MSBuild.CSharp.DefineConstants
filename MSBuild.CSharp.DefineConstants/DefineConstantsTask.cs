@@ -32,7 +32,7 @@ namespace MSBuild.CSharp.DefineConstants
                 ModuleBuilder mb = ab.DefineDynamicModule(aName.Name, targetFile);
                 TypeBuilder tb = mb.DefineType($"{Namespace}.{ClassName}", TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.Abstract);
 
-                // Per property
+                // Create properties
                 foreach (ITaskItem i in DefineConstants)
                 {
                     CreateProperty(i, tb);
@@ -52,6 +52,7 @@ namespace MSBuild.CSharp.DefineConstants
             return !Log.HasLoggedErrors;
         }
 
+        private readonly Regex identifierRegex_ = new Regex("^[a-z_][a-z0-9_]*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private Dictionary<string, string> properties_ = new Dictionary<string, string>();
         private void CreateProperty(ITaskItem item, TypeBuilder typeBuilder)
         {
@@ -69,14 +70,18 @@ namespace MSBuild.CSharp.DefineConstants
                 key = kv.Substring(0, eq);
                 val = kv.Substring(eq + 1);
             }
+
+            // Validate property name.
             if (string.IsNullOrWhiteSpace(key))
             {
                 Log.LogError($"Ilegal key-value pair '{kv}'");
                 return;
             }
-
-            // Validate property name.
-            ValidateIdentifier(key);
+            if (!identifierRegex_.IsMatch(key))
+            {
+                Log.LogError($"'{key}' is not a valid C# identifier");
+                return;
+            }
 
             // Warn on duplicate
             if (properties_.ContainsKey(key))
@@ -98,15 +103,6 @@ namespace MSBuild.CSharp.DefineConstants
             Log.LogMessage(MessageImportance.Low, $"Created constant property '{key}'='{val}'");
 
             properties_.Add(key, val);
-        }
-
-        private readonly Regex identifierRegex_ = new Regex("^[a-z_][a-z0-9_]*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private void ValidateIdentifier(string name)
-        {
-            if (!identifierRegex_.IsMatch(name))
-            {
-                Log.LogError($"'{name}' is not a valid C# identifier");
-            }
         }
 
         [Required]
