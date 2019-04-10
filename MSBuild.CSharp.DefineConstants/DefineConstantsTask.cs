@@ -79,7 +79,7 @@ namespace MSBuild.CSharp.DefineConstants
             }
             if (!identifierRegex_.IsMatch(key))
             {
-                Log.LogError($"'{key}' is not a valid C# identifier");
+                Log.LogError($"'{key}' is not a valid C# identifier. Allowed identifiers begin with a letter or an underscore, and contain only letters, digits, and underscores");
                 return;
             }
 
@@ -95,11 +95,11 @@ namespace MSBuild.CSharp.DefineConstants
 
             PropertyBuilder pb = typeBuilder.DefineProperty(key, PropertyAttributes.None, typeof(string), null);
             MethodAttributes getAttr = MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Static;
-            MethodBuilder mbNumberGetAccessor = typeBuilder.DefineMethod($"get_{key}", getAttr, typeof(string), Type.EmptyTypes);
-            ILGenerator numberGetIL = mbNumberGetAccessor.GetILGenerator();
-            numberGetIL.Emit(OpCodes.Ldstr, val);
-            numberGetIL.Emit(OpCodes.Ret);
-            pb.SetGetMethod(mbNumberGetAccessor);
+            MethodBuilder mbGetAccessor = typeBuilder.DefineMethod($"get_{key}", getAttr, typeof(string), Type.EmptyTypes);
+            ILGenerator getIL = mbGetAccessor.GetILGenerator();
+            getIL.Emit(OpCodes.Ldstr, val);
+            getIL.Emit(OpCodes.Ret);
+            pb.SetGetMethod(mbGetAccessor);
             Log.LogMessage(MessageImportance.Low, $"Created constant property '{key}'='{val}'");
 
             properties_.Add(key, val);
