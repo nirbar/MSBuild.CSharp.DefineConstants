@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildThisFileDirectory)TidyBuild.user.props" Condition="Exists('$(MSBuildThisFileDirectory)TidyBuild.user.props')"/>
   <PropertyGroup>
-    <FullVersion>1.0.0</FullVersion>
+    <FullVersion>1.1.0</FullVersion>
     <NugetDir Condition="'$(NugetDir)'==''">$(MSBuildThisFileDirectory)..\Tools\</NugetDir>
   </PropertyGroup>
 </Project>
