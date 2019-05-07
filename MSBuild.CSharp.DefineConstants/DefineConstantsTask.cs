@@ -61,6 +61,7 @@ namespace MSBuild.CSharp.DefineConstants
         private enum PropertyType
         {
             String,
+            StringArray,
             Bool,
             Int
         }
@@ -116,6 +117,10 @@ namespace MSBuild.CSharp.DefineConstants
                     type = typeof(int);
                     break;
 
+                case PropertyType.StringArray:
+                    type = typeof(string[]);
+                    break;
+
                 case PropertyType.String:
                 default:
                     pt = PropertyType.String;
@@ -157,15 +162,47 @@ namespace MSBuild.CSharp.DefineConstants
                     break;
 
                 case PropertyType.Int:
-                    int i;
-                    if (!int.TryParse(val, out i))
                     {
-                        Log.LogError($"Can't use '{val}' as an integer value as specified by 'Type' metadata for item '{key}'");
-                        return;
+                        int i;
+                        if (!int.TryParse(val, out i))
+                        {
+                            Log.LogError($"Can't use '{val}' as an integer value as specified by 'Type' metadata for item '{key}'");
+                            return;
+                        }
+                        getIL.Emit(OpCodes.Ldc_I4, i);
+                        break;
                     }
-                    getIL.Emit(OpCodes.Ldc_I4, i);
-                    break;
 
+                case PropertyType.StringArray:
+                    {
+                        string[] elements = val.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                        if ((elements == null) || (elements.Length == 0))
+                        {
+                            Log.LogError($"Can't use '{val}' as a string array as specified by 'Type' metadata for item '{key}'");
+                            return;
+                        }
+
+                        getIL.DeclareLocal(typeof(string[]));
+                        getIL.DeclareLocal(typeof(string[]));
+
+                        getIL.Emit(OpCodes.Ldc_I4, elements.Length);
+                        getIL.Emit(OpCodes.Newarr, typeof(string));
+                        getIL.Emit(OpCodes.Stloc_1);
+
+                        for (int i = 0; i < elements.Length; ++i)
+                        {
+                            getIL.Emit(OpCodes.Ldloc_1);
+                            getIL.Emit(OpCodes.Ldc_I4, i);
+                            getIL.Emit(OpCodes.Ldstr, elements[i]);
+                            getIL.Emit(OpCodes.Stelem_Ref);
+                        }
+
+                        getIL.Emit(OpCodes.Ldloc_1);
+                        getIL.Emit(OpCodes.Stloc_0);
+                        getIL.Emit(OpCodes.Ldloc_0);
+
+                        break;
+                    }
                 case PropertyType.String:
                     getIL.Emit(OpCodes.Ldstr, val);
                     break;

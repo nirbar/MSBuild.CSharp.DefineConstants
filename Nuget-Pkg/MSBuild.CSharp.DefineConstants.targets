@@ -10,11 +10,15 @@
 
   <!-- Example usage
   <Target Name="BeforeBuild" BeforeTargets="CSharpDefineConstants">
+    <PropertyGroup>
+      <MyStringArray>val1;val2;val3;;</MyStringArray>
+    </PropertyGroup>
+    
     <ItemGroup>
       <CSharpDefineConstants Include="MyStr=some string">
         <Type>String</Type>
       </CSharpDefineConstants>
-      <CSharpDefineConstants Include="MyBoolTrue=True">
+      <CSharpDefineConstants Include="MyBoolTrue=TrUe">
         <Type>Bool</Type>
       </CSharpDefineConstants>
       <CSharpDefineConstants Include="MyBoolFalse=false">
@@ -31,6 +35,9 @@
       </CSharpDefineConstants>
       <CSharpDefineConstants Include="MyInt_14534543=-14534543">
         <Type>Int</Type>
+      </CSharpDefineConstants>
+      <CSharpDefineConstants Include="MyStringArray=$(MyStringArray.Replace(';', ';'))">
+        <Type>StringArray</Type>
       </CSharpDefineConstants>
     </ItemGroup>
   </Target>
