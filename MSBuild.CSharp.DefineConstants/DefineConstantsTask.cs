@@ -144,8 +144,14 @@ namespace MSBuild.CSharp.DefineConstants
                     bool b;
                     if (!bool.TryParse(val, out b))
                     {
-                        Log.LogError($"Can't use '{val}' as a boolean value as specified by 'Type' metadata for item '{key}'");
-                        return;
+                        int n;
+                        if (!int.TryParse(val, out n))
+                        {
+                            Log.LogError($"Can't use '{val}' as a boolean value as specified by 'Type' metadata for item '{key}'. Supported values are '{bool.TrueString}', '{bool.FalseString}', and numeric zero / non-zero values");
+                            return;
+                        }
+                        b = (n != 0);
+                        Log.LogWarning($"Using numeric '{val}' as a boolean '{b}' value");
                     }
                     getIL.Emit(b ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
                     break;

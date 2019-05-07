@@ -20,6 +20,12 @@
       <CSharpDefineConstants Include="MyBoolFalse=false">
         <Type>Bool</Type>
       </CSharpDefineConstants>
+      <CSharpDefineConstants Include="MyBool0=0">
+        <Type>Bool</Type>
+      </CSharpDefineConstants>
+      <CSharpDefineConstants Include="MyBool8=8">
+        <Type>Bool</Type>
+      </CSharpDefineConstants>
       <CSharpDefineConstants Include="MyInt14534543=14534543">
         <Type>Int</Type>
       </CSharpDefineConstants>
