@@ -8,7 +8,6 @@
                          TargetAssembly="$(IntermediateOutputPath)CSharpDefineConstants.dll"/>
   </Target>
 
-  <!-- Example usage
   <Target Name="BeforeBuild" BeforeTargets="CSharpDefineConstants">
     <PropertyGroup>
       <MyStringArray>val1;val2;val3;;</MyStringArray>
@@ -41,5 +40,4 @@
       </CSharpDefineConstants>
     </ItemGroup>
   </Target>
-   -->
 </Project>
