@@ -1,0 +1,44 @@
+name: Build
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      publish_nuget:
+        description: 'Publish nuget package?'
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  PanelSwWixExtension-Build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3.3.0
+        with:
+          submodules: 'true'
+      - uses: microsoft/setup-msbuild@v1
+
+      - name: Resolve build version
+        run: |
+          $xmlDoc = New-Object System.Xml.XmlDocument
+          $file = [System.IO.Path]::Combine("${{ github.workspace }}", "TidyBuild.custom.props")
+          [xml]$xmlDoc = Get-Content $file
+          $node = $xmlDoc.SelectSingleNode('//*[local-name(.)="FullVersion"]')
+          Add-Content -Path ${{ github.env }} -Value ("FULL_VERSION=" + $node.InnerText + ".${{ github.run_number }}")
+
+      - name: Build
+        run: msbuild MSBuild.CSharp.DefineConstants.sln -restore -p:FullVersion=${{ env.FULL_VERSION }} -p:Configuration=Release
+
+      - uses: actions/upload-artifact@v3.1.2
+        with:
+          name: nuget
+          path: nuget-out\*.nupkg
+
+      - name: Publish nuget packages to github and nuget.org
+        if: ${{ github.event.inputs.publish_nuget == 'true' && github.ref == 'refs/heads/master' }}
+        run: |
+          dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          dotnet nuget push nuget-out\MSBuild.CSharp.DefineConstants.${{ env.FULL_VERSION }}.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source github
+          dotnet nuget push nuget-out\MSBuild.CSharp.DefineConstants.${{ env.FULL_VERSION }}.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+          git tag "v${{ env.FULL_VERSION }}"
+          git push --tags
