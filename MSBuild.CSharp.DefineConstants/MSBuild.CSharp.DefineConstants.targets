@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildThisFileDirectory)MSBuild.CSharp.DefineConstants.tasks"/>
+
+  <PropertyGroup>
+    <CSharpDefineConstantsNamespace Condition="'$(CSharpDefineConstantsNamespace)' == ''">$(DefaultCSharpDefineConstantsNamespace)</CSharpDefineConstantsNamespace>
+    <CSharpDefineConstantsClassName Condition="'$(CSharpDefineConstantsClassName)' == ''">$(DefaultCSharpDefineConstantsClassName)</CSharpDefineConstantsClassName>
+    <CSharpDefineConstantsFileName Condition="'$(CSharpDefineConstantsFileName)' == ''">$(DefaultCSharpDefineConstantsFileName)</CSharpDefineConstantsFileName>
+    <CSharpDefineConstantsTargetPath Condition="'$(CSharpDefineConstantsTargetPath)' == ''">$(DefaultCSharpDefineConstantsTargetPath)</CSharpDefineConstantsTargetPath>
+    <CSharpDefineConstantsDependsOn>$(CSharpDefineConstantsDependsOn)</CSharpDefineConstantsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="CSharpDefineConstants" BeforeTargets="CoreCompile;BeforeCompile" DependsOnTargets="$(CSharpDefineConstantsDependsOn)">
+    <DefineConstantsTask DefineConstants="@(CSharpDefineConstants)"
+                         Namespace="$(CSharpDefineConstantsNamespace)"
+                         ClassName="$(CSharpDefineConstantsClassName)"
+                         TargetPath="$(CSharpDefineConstantsTargetPath)">
+      <Output TaskParameter="CreatedSourceFile" ItemName="CreatedSourceFile"/>    
+    </DefineConstantsTask>
+  </Target>
+  <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    <Compile Include="$(CSharpDefineConstantsTargetPath)">
+      <AutoGen>true</AutoGen>
+      <Link>Properties\$(CSharpDefineConstantsFileName)</Link>
+    </Compile>
+  </ItemGroup>
+</Project>

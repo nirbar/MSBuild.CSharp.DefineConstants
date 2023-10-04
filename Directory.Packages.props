@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="TidyBuild" Version="1.5.2"/>
+    <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.4.0" />
+  </ItemGroup>
+</Project>

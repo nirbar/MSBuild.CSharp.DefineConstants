@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <DefaultCSharpDefineConstantsNamespace>Preprocessor</DefaultCSharpDefineConstantsNamespace>
+    <DefaultCSharpDefineConstantsClassName>Constants</DefaultCSharpDefineConstantsClassName>
+    <DefaultCSharpDefineConstantsFileName>$(DefaultCSharpDefineConstantsClassName).cs</DefaultCSharpDefineConstantsFileName>
+    <DefaultCSharpDefineConstantsTargetPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)\$(DefaultCSharpDefineConstantsFileName)'))</DefaultCSharpDefineConstantsTargetPath>
+  </PropertyGroup>
+</Project>
